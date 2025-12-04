@@ -1,0 +1,123 @@
+\documentclass[conference, twocolumn]{IEEEtran}
+
+\usepackage[english]{babel}
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\title{Evaluating Performance and Security Trade-offs in Modern Password Hashing Algorithms}
+\author{Christian Chung\\
+\texttt{cc72574@eid.utexas.edu}\\
+\texttt{UT Austin, TX}}
+\date{}
+
+\begin{document}
+\maketitle
+
+%%%%%%%%%%
+\begin{abstract}
+Password hashing algorithms play a critical role in protecting user credentials in modern authentication systems. As data breaches continue to escalate and attackers gain access to increasingly powerful hardware, the security of stored passwords depends heavily on the choice and configuration of the hashing algorithm. 
+
+Traditional fast hashes enable rapid brute-force attacks, while modern slow-hash algorithms such as PBKDF2, bcrypt, and Argon2 improve security by intentionally increasing computational or memory costs. This project experimentally measures the real-world performance of PBKDF2, bcrypt, and Argon2 on a consumer laptop to quantify their security--performance trade-offs. 
+
+This report presents empirical hashing times across varying cost parameters and discusses how algorithmic design influences brute-force resistance.
+\end{abstract}
+
+%%%%%%%%%%
+\section{Introduction}
+As digital services continue to expand, large-scale password database breaches have become increasingly common. When attackers obtain hashed passwords, the strength of the hashing algorithm often determines whether users' accounts remain secure. Commodity hardware---including GPUs and FPGAs---can compute billions of fast hash functions per second, rendering traditional hashes such as SHA-1 and SHA-256 insufficient for password storage.
+
+The key problem is that many systems still rely on fast, computationally inexpensive hashing algorithms due to ease of implementation or legacy compatibility. This creates a security gap: attackers can brute-force billions of guesses per second, while defenders may lack practical intuition about how much protection slow hashing algorithms provide.
+
+This project evaluates PBKDF2, bcrypt, and Argon2 on consumer-grade hardware and quantifies how their tunable cost parameters affect both performance and security. By providing real benchmark measurements, this work helps clarify the practical trade-offs involved in selecting secure password hashing configurations.
+
+%%%%%%%%%%
+\section{Motivation}
+Prior research has demonstrated that fast hashing algorithms are unsuitable for password storage due to their susceptibility to massively parallel brute-force attacks. PBKDF2 introduced standardized iteration-based key stretching, bcrypt added exponential cost scaling, and Argon2 incorporated memory hardness to resist GPU/ASIC parallelization.
+
+This project builds on prior work by generating fresh, reproducible empirical data for these algorithms under realistic configurations. Rather than proposing new hashing techniques, this work contributes practical performance measurements suitable for developer guidance.
+
+%%%%%%%%%%
+\section{Design and Experimental Setup}
+
+The experiment consists of three components:
+
+\begin{enumerate}
+    \item \textbf{Hashing Benchmark Module:}
+    Implements PBKDF2 (via \texttt{cryptography}), bcrypt (via \texttt{bcrypt}), and Argon2id (via \texttt{argon2-cffi}). Outputs per-hash runtime in milliseconds.
+    
+    \item \textbf{Brute-force Demonstration Module:}
+    Uses measured hashing times to estimate attacker cracking throughput. Also includes a PRNG brute-force demonstration to illustrate weakness of non-cryptographic randomness.
+
+    \item \textbf{Analysis Engine:}
+    Aggregates benchmark data and compares how increasing cost parameters influence attacker workload.
+\end{enumerate}
+
+All experiments were performed on a standard consumer Windows laptop using Python 3.13.
+
+%%%%%%%%%%
+\section{Evaluation and Results}
+
+\subsection{Hashing Performance}
+
+Tables below summarize the measured runtimes for each hashing algorithm and cost setting.
+
+\subsubsection*{PBKDF2 Results}
+\begin{itemize}
+    \item 50{,}000 iterations: 0.0106 s
+    \item 100{,}000 iterations: 0.0200 s
+    \item 200{,}000 iterations: 0.0397 s
+\end{itemize}
+
+\subsubsection*{bcrypt Results}
+\begin{itemize}
+    \item cost 10: 58.66 ms
+    \item cost 12: 230.90 ms
+    \item cost 14: 924.40 ms
+\end{itemize}
+
+\subsubsection*{Argon2id Results}
+\begin{itemize}
+    \item 64MB, t=2: 49.55 ms
+    \item 128MB, t=2: 49.69 ms
+    \item 256MB, t=3: 53.08 ms
+\end{itemize}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{c|c|c}
+Algorithm & Cost Setting & Time (ms) \\\hline
+PBKDF2 & 50k iters & 10.6 \\
+PBKDF2 & 100k iters & 20.0 \\
+PBKDF2 & 200k iters & 39.7 \\\hline
+bcrypt & cost 10 & 58.66 \\
+bcrypt & cost 12 & 230.90 \\
+bcrypt & cost 14 & 924.40 \\\hline
+Argon2id & 64MB, t=2 & 49.55 \\
+Argon2id & 128MB, t=2 & 49.69 \\
+Argon2id & 256MB, t=3 & 53.08 \\
+\end{tabular}
+\caption{Measured hashing times for PBKDF2, bcrypt, and Argon2id.}
+\end{table}
+
+\subsection{Analysis}
+
+PBKDF2 scales linearly with iteration count, while bcrypt demonstrates exponential growth due to its cost parameter structure. Argon2id exhibits relatively stable runtime across different memory settings on this hardware, although its memory hardness is expected to provide better resistance on GPU-accelerated systems.
+
+\subsection{Brute-Force Estimates}
+
+Using measured runtimes, an attacker running PBKDF2 at 100k iterations could attempt roughly 50 hashes per second, compared to only 1--4 hashes per second for high-cost bcrypt or Argon2 configurations. These results illustrate how cost tuning can multiply attacker workload by two to three orders of magnitude.
+
+%%%%%%%%%%
+\section{Related Work}
+\input{related}
+
+%%%%%%%%%%
+\section{Conclusions}
+\input{conclusion}
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}
