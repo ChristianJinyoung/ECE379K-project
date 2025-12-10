@@ -1,4 +1,4 @@
-V{
+{
   "name": "Python 3.11 Benchmark Container",
   "build": {
     "dockerfile": "Dockerfile"
