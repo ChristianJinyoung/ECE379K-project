@@ -1,0 +1,29 @@
+Weak password hashing remains one of the biggest causes of credential leaks.
+Even today, many systems still rely on outdated or improperly configured hashing algorithms, which makes passwords far easier to brute-force than people expect.
+
+Prior work focuses heavily on theory, but there’s far less clear, practical benchmarking that shows how these algorithms actually behave on real hardware—especially across CPU cost, memory usage, and brute-force resistance.
+That gap is what motivated our project.
+
+Our goal was simple:
+test modern password hashing algorithms—SHA-256, bcrypt, scrypt, and Argon2id—under identical conditions, and measure how they perform in practice.
+
+We built a Python-based benchmarking suite that runs three types of tests:
+
+CPU runtime per hash
+
+Peak memory usage
+
+Simulated brute-force speed
+
+Our results show a clear pattern:
+
+SHA-256 is extremely fast, which makes it great for integrity checks but terrible for password storage because attackers can test millions of guesses per second.
+
+bcrypt slows attackers down significantly but is still mostly CPU-bound.
+
+scrypt and Argon2id introduce memory hardness, which dramatically increases brute-force cost and makes them far safer against GPU or ASIC attacks.
+
+In conclusion, modern systems should avoid fast hashes entirely, and even bcrypt is no longer ideal for high-security applications.
+Argon2id is the strongest choice today, especially when configured with high memory and iteration parameters.
+
+Our benchmarking makes this visually clear and provides real, reproducible numbers to guide developers toward safer password storage.

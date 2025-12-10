@@ -1,0 +1,146 @@
+\documentclass[conference, twocolumn]{IEEEtran}
+
+\usepackage[english]{babel}
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{float}
+
+\title{Evaluating Performance and Security Trade-offs in Modern Password Hashing Algorithms}
+\author{Christian Chung\\
+\texttt{cc72574@eid.utexas.edu}\\
+\texttt{UT Austin, TX}}
+\date{}
+
+\begin{document}
+\maketitle
+
+%%%%%%%%%%
+\begin{abstract}
+Password hashing algorithms play a critical role in protecting user credentials in modern authentication systems. As data breaches continue to escalate and attackers gain access to increasingly powerful hardware, the security of stored passwords depends heavily on the choice and configuration of the hashing algorithm. 
+
+The core problem is that traditional hashing algorithms such as SHA-256 are designed for speed, making them vulnerable to rapid brute-force attacks, while modern slow-hash algorithms offer stronger protection but require higher computational costs. This project aims to experimentally compare the performance of SHA-256, bcrypt, scrypt, and Argon2 on a consumer laptop to illustrate their security and performance trade-offs. For the initial report, the focus will be on conducting controlled experiments to measure hashing time, memory usage, and CPU-based brute-force resistance. The goal is to determine how algorithm choice alone can significantly strengthen password storage practices. 
+
+{All measured results presented in this report are based on actual benchmark runs rather than initial draft values.}
+\end{abstract}
+
+%%%%%%%%%%
+\section{Introduction}
+The increasing reliance on digital services has led to widespread storage of sensitive user information across the web. As a result, password database breaches have become a frequent and damaging occurrence, exposing millions of hashed passwords to attackers. In an era where commodity hardware can compute billions of hashes per second, the security of users’ accounts depends not only on password strength but also on the choice of hashing algorithm used by service providers.
+
+The central problem is that many systems still rely on fast hashing algorithms such as SHA-256 because they are easy to implement and computationally efficient. Unfortunately, this efficiency enables attackers to perform rapid brute-force attacks with minimal cost. Although stronger algorithms like bcrypt, scrypt, and Argon2 exist and are widely recommended, developers often lack a clear, practical understanding of how these algorithms differ in security and performance. This gap results in insecure deployments that fail to leverage available defenses.
+
+This project introduces an experimental approach to quantify the performance and security differences among common password hashing algorithms. The key insight is that security can be improved not only through user behavior (e.g., stronger passwords) but also through algorithmic cost parameters that intentionally slow down hashing operations. By empirically demonstrating how hashing cost scales with algorithm design, the project provides actionable guidance for secure password storage.
+
+To achieve this, the project evaluates four hashing algorithms—SHA-256, bcrypt, scrypt, and Argon2—on a standard consumer laptop. The experiments will measure time per hash across various parameters, memory requirements for memory-hard algorithms, and CPU-based brute-force time estimates for breaking passwords. The initial report will focus on the setup, methodology, and draft figures, while the final report will present actual measured data, comparisons, and insights.
+
+This project builds directly on prior work by empirically testing the practical performance differences among these algorithms on modern hardware. The goal is not to design a new hashing algorithm, but to extend existing research by demonstrating these differences in a small-scale, reproducible environment suitable for educational purposes.
+
+%%%%%%%%%%
+\section{Motivation}
+A significant body of work has explored the weaknesses of traditional hashing algorithms in password security. Studies have demonstrated that fast algorithms like MD5, SHA-1, and SHA-256 can be computed billions of times per second using GPUs, making them unsuitable for password storage. The introduction of bcrypt (1999) marked a shift toward computationally expensive hashing, but subsequent research identified the need for memory-hard functions to defend against parallel hardware attacks, leading to the development of scrypt and the Argon2 family.
+
+This project builds directly on these insights by empirically testing the practical performance differences among these algorithms on modern hardware. Additional related work—including GPU-accelerated cracking, rainbow tables, and hardware-specific attack optimizations—will be covered in a later Related Work section.
+
+%%%%%%%%%%
+\section{Proposed Design or Architecture}
+The system under evaluation consists of four password hashing implementations running on a single consumer laptop. The design centers around three core components:
+
+\begin{enumerate}
+    \item \textbf{Hashing Benchmark Module}
+    \begin{itemize}
+        \item Inputs: password strings, algorithm parameters
+        \item Outputs: average time per hash
+        \item Implements SHA-256 via hashlib, bcrypt, scrypt, and Argon2 via Python Libraries
+    \end{itemize}
+
+    \item \textbf{Brute-force Simulation Module}
+    \begin{itemize}
+        \item Generates password candidates
+        \item Measures time required for a CPU-only brute force attempt
+        \item Supports both numeric and alphanumeric keyspaces
+    \end{itemize}
+
+    \item \textbf{Analysis Engine}
+    \begin{itemize}
+        \item Aggregates results
+        \item Produces comparative metrics
+        \item Generates draft and final figures
+    \end{itemize}
+\end{enumerate}
+
+Key Metrics to Optimize/Measure:
+\begin{itemize}
+    \item Time per hash (ms)
+    \item Scalability with increased cost parameters
+    \item CPU and memory usage
+    \item Estimated brute-force difficulty for each algorithm
+\end{itemize}
+
+%%%%%%%%%%
+\section{Evaluation / Experimental Results}
+
+\subsection{Hashing Time Comparison}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{l c}
+\hline
+Algorithm & Time per Hash (ms) \\
+\hline
+SHA-256 & {0.0007098} \\
+bcrypt (cost=10) & {69.802} \\
+scrypt & {64.941} \\
+Argon2id & {90.447} \\
+\hline
+\end{tabular}
+\caption{Measured hashing times.}
+\end{table}
+
+\subsection{Memory Usage}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{l c}
+\hline
+Algorithm & Peak Memory (MB) \\
+\hline
+scrypt & {9.25e-05} \\
+Argon2id & {0.01277} \\
+\hline
+\end{tabular}
+\caption{Measured memory usage.}
+\end{table}
+
+\subsection{CPU Brute-Force Estimates}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l c}
+\hline
+Algorithm & Time per Hash (s) \\
+\hline
+SHA-256 & {7.44e-07} \\
+bcrypt & {0.06272} \\
+Argon2id & {0.06032} \\
+\hline
+\end{tabular}
+\caption{Per-hash brute-force cost.}
+\end{table}
+
+%%%%%%%%%%
+\section{Related Work}
+\input{related.tex}
+
+
+%%%%%%%%%%
+\section{Conclusions}
+\input{conclusion.tex}
+
+%%%%%%%%%%
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
