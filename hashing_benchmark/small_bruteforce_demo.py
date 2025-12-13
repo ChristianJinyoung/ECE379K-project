@@ -3,20 +3,15 @@ import hashlib
 import bcrypt
 from argon2 import PasswordHasher
 
-TARGET_PASSWORD = "1234"  # target in the 0000–9999 range
+TARGET_PASSWORD = "1234"
 
-# --- SHA-256 ---
 TARGET_HASH_SHA = hashlib.sha256(TARGET_PASSWORD.encode()).hexdigest()
 
-# --- bcrypt ---
 TARGET_HASH_BCRYPT = bcrypt.hashpw(TARGET_PASSWORD.encode(), bcrypt.gensalt(10))
 
-# --- Argon2id ---
 argon = PasswordHasher(time_cost=2, memory_cost=102400, parallelism=8)
 TARGET_HASH_ARGON = argon.hash(TARGET_PASSWORD)
 
-# --- scrypt ---
-# consistent parameters
 SCRYPT_N = 2**14
 SCRYPT_R = 8
 SCRYPT_P = 1
@@ -24,7 +19,7 @@ SCRYPT_DKLEN = 64
 
 TARGET_HASH_SCRYPT = hashlib.scrypt(
     TARGET_PASSWORD.encode(),
-    salt=b"fixed_salt_1234",  # scrypt *requires* a salt
+    salt=b"fixed_salt_1234",
     n=SCRYPT_N,
     r=SCRYPT_R,
     p=SCRYPT_P,

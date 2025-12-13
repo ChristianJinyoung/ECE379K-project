@@ -7,7 +7,7 @@ def measure_memory(func):
     func()
     current, peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
-    return peak / (1024 * 1024)  # MB
+    return peak / (1024 * 1024)
 
 def run_scrypt():
     hashlib.scrypt(b"password", salt=b"saltsalt", n=2**14, r=8, p=1)

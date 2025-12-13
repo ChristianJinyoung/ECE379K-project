@@ -20,10 +20,9 @@ def time_per_argon2():
     ph.hash("password")
     return time.time() - start
 
-# character set sizes
 lowercase = 26
 digits = 10
-charset = lowercase + digits  # adjust if needed
+charset = lowercase + digits
 
 def estimate_bruteforce(time_per_hash, length):
     total = charset ** length

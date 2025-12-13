@@ -9,7 +9,7 @@ def bench_sha256():
     for _ in range(10000):
         hashlib.sha256(b"password").hexdigest()
     end = time.time()
-    return (end - start) / 10000 * 1000  # ms per hash
+    return (end - start) / 10000 * 1000
 
 def bench_bcrypt(cost):
     total = 0
@@ -37,7 +37,7 @@ def bench_scrypt():
 def bench_argon2():
     ph = argon2.PasswordHasher(
         time_cost=2,
-        memory_cost=65536,   # 64 MB
+        memory_cost=65536,
         parallelism=2
     )
     total = 0
